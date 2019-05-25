@@ -1,6 +1,6 @@
 ﻿// <copyright file="PropertyChangeSet.cs" company="Glen Nicol">
-// Copyright (c) Glen Nicol. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//     Copyright (c) Glen Nicol. All rights reserved. Licensed under the MIT license. See LICENSE
+//     file in the project root for full license information.
 // </copyright>
 
 using System;

@@ -1,6 +1,6 @@
 ﻿// <copyright file="RecordUtil.cs" company="Glen Nicol">
-// Copyright (c) Glen Nicol. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//     Copyright (c) Glen Nicol. All rights reserved. Licensed under the MIT license. See LICENSE
+//     file in the project root for full license information.
 // </copyright>
 
 using System;
@@ -16,7 +16,8 @@ namespace RecordShims
         private static readonly Lazy<Func<object, object>> MEMBER_WISE_CLONE = new Lazy<Func<object, object>>(GetProtectedMemberWiseClone);
 
         /// <summary>
-        /// This exposes the protected <see cref="object.MemberwiseClone"/> method to be used by any class on any object. Use with caution.
+        /// This exposes the protected <see cref="object.MemberwiseClone"/> method to be used by any
+        /// class on any object. Use with caution.
         /// </summary>
         /// <typeparam name="T">the type of the clone to create.</typeparam>
         /// <param name="toCopy"></param>

@@ -1,14 +1,17 @@
 ﻿// <copyright file="RecordBase.cs" company="Glen Nicol">
-// Copyright (c) Glen Nicol. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//     Copyright (c) Glen Nicol. All rights reserved. Licensed under the MIT license. See LICENSE
+//     file in the project root for full license information.
 // </copyright>
 
 namespace RecordShims
 {
     /// <summary>
-    /// This abstract class provides a starting place for record classes that do not already have a base class.
+    /// This abstract class provides a starting place for record classes that do not already have a
+    /// base class.
     /// </summary>
-    /// <typeparam name="T">The record type. This should be the type of the class inheriting this base class.</typeparam>
+    /// <typeparam name="T">
+    /// The record type. This should be the type of the class inheriting this base class.
+    /// </typeparam>
     public abstract class RecordBase<T> : IRecord<T>
         where T : class
     {
@@ -27,7 +30,8 @@ namespace RecordShims
         }
 
         /// <summary>
-        /// Throws if any internal constraints between properties has been violated. This is called after mutations have been applied to the shallow copy.
+        /// Throws if any internal constraints between properties has been violated. This is called
+        /// after mutations have been applied to the shallow copy.
         /// </summary>
         /// <param name="record"></param>
         public abstract void ThrowIfConstraintsAreViolated(T record);
