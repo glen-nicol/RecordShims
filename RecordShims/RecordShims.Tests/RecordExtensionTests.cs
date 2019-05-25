@@ -132,6 +132,19 @@ namespace RecordShims.Tests
             Assert.Throws<MissingMemberException>(() => original.StartChangeSet().Mutate("NonExistant", 1));
         }
 
+        [Test]
+        public void Can_mutate_readonly_auto_properties()
+        {
+            var original = new TestingClass();
+
+            var record2 = original.StartChangeSet()
+                .Mutate(t => t.ReadonlyAutoBool, true)
+                .ToNewRecord(original);
+
+            Assert.IsTrue(record2.ReadonlyAutoBool);
+            Assert.IsFalse(original.ReadonlyAutoBool);
+        }
+
         private class TestingClass : RecordBase<TestingClass>, IEquatable<TestingClass>
         {
             public int AnInteger { get; private set; }
@@ -139,6 +152,8 @@ namespace RecordShims.Tests
             public double ADouble { get; private set; }
 
             public DateTimeOffset RecordedAt { get; private set; }
+
+            public bool ReadonlyAutoBool { get; }
 
             public bool Equals(TestingClass other)
             {

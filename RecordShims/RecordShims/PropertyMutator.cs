@@ -23,6 +23,7 @@ namespace RecordShims
         public delegate object Mutator(TRecord originalRecord);
 
         private readonly PropertyInfo _propertyInfo;
+        private readonly FieldInfo _readonlyAutoPropertyField;
         private readonly Mutator _mutator;
 
         /// <summary>
@@ -35,6 +36,8 @@ namespace RecordShims
         /// </summary>
         public string PropertyName => Property.Name;
 
+        private bool IsReadonlyAutoProperty => _readonlyAutoPropertyField != null;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMutator{TRecord}"/> class.
         /// </summary>
@@ -44,6 +47,22 @@ namespace RecordShims
         {
             _propertyInfo = property ?? throw new ArgumentNullException(nameof(property));
             _mutator = mutator ?? throw new ArgumentNullException(nameof(mutator));
+
+            if(!_propertyInfo.CanWrite)
+            {
+                var backingFieldName = GetBackingFieldName(PropertyName);
+                _readonlyAutoPropertyField = typeof(TRecord).GetField(backingFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+                if(!IsReadonlyAutoProperty)
+                {
+                    throw new ArgumentException("The " + PropertyName + " property does not have a setter and is not a readonly auto property.");
+                }
+            }
+
+            string GetBackingFieldName(string propertyName)
+            {
+                // https://stackoverflow.com/a/14210097
+                return string.Format("<{0}>k__BackingField", propertyName);
+            }
         }
 
         /// <summary>
@@ -149,7 +168,18 @@ namespace RecordShims
         /// <param name="newRecord"></param>
         public void ApplyMutation(TRecord originalRecord, TRecord newRecord)
         {
-            _propertyInfo.SetValue(newRecord, _mutator(originalRecord));
+            var newValue = _mutator(originalRecord);
+            if(IsReadonlyAutoProperty)
+            {
+                // This is a bit scary since these are readonly fields. But we don't have much choice
+                // if we want to support modifying readonly auto properties. We are already violating
+                // the private accessibility so why not keep going for great justice!
+                _readonlyAutoPropertyField.SetValue(newRecord, newValue);
+            }
+            else
+            {
+                _propertyInfo.SetValue(newRecord, newValue);
+            }
         }
 
         private static PropertyInfo GetByNameAndThrowIfMissingOrUncastable<TVal>(string propertyName)
