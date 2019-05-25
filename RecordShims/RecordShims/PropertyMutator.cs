@@ -51,11 +51,32 @@ namespace RecordShims
         /// </summary>
         /// <param name="property"></param>
         /// <param name="newValue"></param>
-        /// <returns>The property mutator that will apply the value to any record it is applied to.</returns>
+        /// <returns>
+        /// The property mutator that will apply the value to any record it is applied to.
+        /// </returns>
         public static PropertyMutator<TRecord> FromAssignment(PropertyInfo property, object newValue) => new PropertyMutator<TRecord>(property, _ => newValue);
 
         /// <summary>
-        /// Creates a mutator from a provided transform function. The result depends on how the function transforms from the previous record value.
+        /// Creates a mutator from a provided value. The result is similar to an assignment of a constant.
+        /// </summary>
+        /// <typeparam name="TVal">The transform type. It must be assignable to the property.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> does not exist on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if <paramref name="propertyName"/> cannot be assigned from <typeparamref name="TVal"/>.
+        /// </exception>
+        /// <returns>
+        /// The property mutator that will apply the value to any record it is applied to.
+        /// </returns>
+        public static PropertyMutator<TRecord> FromAssignment<TVal>(string propertyName, TVal newValue)
+            => FromAssignment(GetByNameAndThrowIfMissingOrUncastable<TVal>(propertyName), newValue);
+
+        /// <summary>
+        /// Creates a mutator from a provided transform function. The result depends on how the
+        /// function transforms from the previous record value.
         /// </summary>
         /// <param name="property"></param>
         /// <param name="mutator"></param>
@@ -63,11 +84,26 @@ namespace RecordShims
         public static PropertyMutator<TRecord> FromTransform(PropertyInfo property, Mutator mutator) => new PropertyMutator<TRecord>(property, mutator);
 
         /// <summary>
-        /// Gets the property info for an expression that looks like this x => x.PropertyName.
+        /// Creates a mutator from a provided transform function. The result depends on how the
+        /// function transforms from the previous record value.
         /// </summary>
-        /// <remarks>
-        /// Taken from "https://stackoverflow.com/a/672212".
-        /// </remarks>
+        /// <typeparam name="TVal">The transform type. It must be assignable to the property.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="mutator"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> does not exist on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if <paramref name="propertyName"/> cannot be assigned from <typeparamref name="TVal"/>.
+        /// </exception>
+        /// <returns>The property mutator that will apply the transform to get the result.</returns>
+        public static PropertyMutator<TRecord> FromTransform<TVal>(string propertyName, Func<TRecord, TVal> mutator)
+            => FromTransform(GetByNameAndThrowIfMissingOrUncastable<TVal>(propertyName), r => mutator(r));
+
+        /// <summary>
+        /// Gets the property info for an expression that looks like this x =&gt; x.PropertyName.
+        /// </summary>
+        /// <remarks>Taken from "https://stackoverflow.com/a/672212".</remarks>
         /// <typeparam name="TProperty">The property type.</typeparam>
         /// <param name="propertyLambda"></param>
         /// <exception cref="ArgumentException">Expression is malformed.</exception>
@@ -106,13 +142,32 @@ namespace RecordShims
         }
 
         /// <summary>
-        /// Applies the mutation to the <paramref name="newRecord"/> by using <paramref name="originalRecord"/> to do any transforms.
+        /// Applies the mutation to the <paramref name="newRecord"/> by using <paramref
+        /// name="originalRecord"/> to do any transforms.
         /// </summary>
         /// <param name="originalRecord"></param>
         /// <param name="newRecord"></param>
         public void ApplyMutation(TRecord originalRecord, TRecord newRecord)
         {
             _propertyInfo.SetValue(newRecord, _mutator(originalRecord));
+        }
+
+        private static PropertyInfo GetByNameAndThrowIfMissingOrUncastable<TVal>(string propertyName)
+        {
+            var propertyInfo = typeof(TRecord).GetProperty(propertyName);
+            if(propertyInfo == null)
+            {
+                throw new MissingMemberException(typeof(TRecord).FullName, propertyName);
+            }
+
+            // throwing here will make it more obvious to the caller which mutation is causing the
+            // problem rather than waiting for the mutation to be applied.
+            if(!propertyInfo.PropertyType.IsAssignableFrom(typeof(TVal)))
+            {
+                throw new InvalidCastException("Cannot cast " + typeof(TVal) + " to " + propertyInfo.PropertyType);
+            }
+
+            return propertyInfo;
         }
     }
 }

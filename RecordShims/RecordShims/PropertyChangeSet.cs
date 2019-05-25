@@ -23,7 +23,8 @@ namespace RecordShims
         public IReadOnlyCollection<PropertyMutator<TRecord>> Mutators => _mutationSet.Values;
 
         /// <summary>
-        /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and specified <paramref name="newValue"/>.
+        /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and
+        /// specified <paramref name="newValue"/>.
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
@@ -37,7 +38,8 @@ namespace RecordShims
         }
 
         /// <summary>
-        /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and specified <paramref name="mutatorFunc"/> .
+        /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and
+        /// specified <paramref name="mutatorFunc"/> .
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
@@ -48,6 +50,38 @@ namespace RecordShims
             var propertyInfo = PropertyMutator<TRecord>.GetPropertyFromExpression(propertyAccessor);
             var mutator = PropertyMutator<TRecord>.FromTransform(propertyInfo, r => mutatorFunc(r));
             return Mutate(mutator);
+        }
+
+        /// <summary>
+        /// Adds a mutator for the property named <paramref name="propertyName"/> and specified
+        /// <paramref name="mutatorFunc"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="mutatorFunc"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <returns>A new API to enable a more fluent API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(string propertyName, Func<TRecord, TVal> mutatorFunc)
+        {
+            return Mutate(PropertyMutator<TRecord>.FromTransform(propertyName, r => mutatorFunc(r)));
+        }
+
+        /// <summary>
+        /// Adds a mutator for the property named <paramref name="propertyName"/> and specified
+        /// <paramref name="newValue"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <returns>A new API to enable a more fluent API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(string propertyName, TVal newValue)
+        {
+            return Mutate(PropertyMutator<TRecord>.FromAssignment(propertyName, newValue));
         }
 
         /// <summary>
@@ -62,7 +96,8 @@ namespace RecordShims
         }
 
         /// <summary>
-        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, TVal)"/>.
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord,
+        /// TVal}}, TVal)"/>.
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
@@ -74,7 +109,8 @@ namespace RecordShims
         }
 
         /// <summary>
-        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, Func{TRecord, TVal})"/>.
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord,
+        /// TVal}}, Func{TRecord, TVal})"/>.
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
@@ -83,6 +119,36 @@ namespace RecordShims
         public ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, Func<TRecord, TVal> mutatorFunc)
         {
             return Mutate(propertyAccessor, mutatorFunc);
+        }
+
+        /// <summary>
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(string, Func{TRecord, TVal})"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="mutatorFunc"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <returns>this API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(string propertyName, Func<TRecord, TVal> mutatorFunc)
+        {
+            return Mutate(propertyName, mutatorFunc);
+        }
+
+        /// <summary>
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(string, TVal)"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <returns>this API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(string propertyName, TVal newValue)
+        {
+            return Mutate(propertyName, newValue);
         }
 
         /// <summary>

@@ -22,7 +22,8 @@ namespace RecordShims
         ISubsequentPropertyChangeSetApi<TRecord> AndMutate(PropertyMutator<TRecord> mutator);
 
         /// <summary>
-        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, Func{TRecord, TVal})"/>.
+        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord,
+        /// TVal}}, Func{TRecord, TVal})"/>.
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
@@ -31,12 +32,43 @@ namespace RecordShims
         ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, Func<TRecord, TVal> mutatorFunc);
 
         /// <summary>
-        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, TVal)"/>.
+        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord,
+        /// TVal}}, TVal)"/>.
         /// </summary>
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
         /// <param name="newValue"></param>
         /// <returns>this API.</returns>
         ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, TVal newValue);
+
+        /// <summary>
+        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(string, Func{TRecord, TVal})"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="mutatorFunc"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if <paramref name="propertyName"/> cannot be assigned from <typeparamref name="TVal"/>.
+        /// </exception>
+        /// <returns>this API.</returns>
+        ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(string propertyName, Func<TRecord, TVal> mutatorFunc);
+
+        /// <summary>
+        /// The same as <see cref="IPropertyChangeSet{TRecord}.Mutate{TVal}(string, TVal)"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown if <paramref name="propertyName"/> is not a property on <typeparamref name="TRecord"/>.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if <paramref name="propertyName"/> cannot be assigned from <typeparamref name="TVal"/>.
+        /// </exception>
+        /// <returns>this API.</returns>
+        ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(string propertyName, TVal newValue);
     }
 }

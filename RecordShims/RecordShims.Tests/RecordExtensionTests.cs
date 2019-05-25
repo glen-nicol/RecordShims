@@ -111,6 +111,28 @@ namespace RecordShims.Tests
             Assert.Throws<ArgumentException>(() => original.CopyAndApply(changeset));
         }
 
+        [Test]
+        public void Can_use_string_but_type_safety_is_not_static()
+        {
+            var original = new TestingClass();
+
+            // This method should be a bit more performant becasue it avoids expression walking, but
+            // it sacrifices type safety.
+            var record2 = original.StartChangeSet()
+                .Mutate(nameof(original.AnInteger), 1)
+                .AndMutate(nameof(original.ADouble), 1.0)
+                .ToNewRecord(original);
+
+            Assert.AreEqual(1, record2.AnInteger);
+            Assert.AreEqual(1, record2.ADouble);
+
+            // pitfalls type mismatch
+            Assert.Throws<InvalidCastException>(() => original.StartChangeSet().Mutate(nameof(original.RecordedAt), 1));
+
+            // missing property
+            Assert.Throws<MissingMemberException>(() => original.StartChangeSet().Mutate("NonExistant", 1));
+        }
+
         private class TestingClass : RecordBase<TestingClass>, IEquatable<TestingClass>
         {
             public int AnInteger { get; private set; }
