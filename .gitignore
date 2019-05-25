@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# XML documentation file does not need to be tracked because it is generated.
+/RecordShims/RecordShims/RecordShims.xml

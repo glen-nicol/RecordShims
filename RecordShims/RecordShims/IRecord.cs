@@ -1,4 +1,7 @@
-﻿using System;
+﻿// <copyright file="IRecord.cs" company="Glen Nicol">
+// Copyright (c) Glen Nicol. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
 
 namespace RecordShims
 {
@@ -9,10 +12,10 @@ namespace RecordShims
     /// <code>
     /// class RecordType : IRecord&lt;RecordType&gt;
     /// {
-    /// 
+    ///
     /// }
     /// </code></example>
-    /// <typeparam name="T">The record type</typeparam>
+    /// <typeparam name="T">The record type.</typeparam>
     public interface IRecord<T>
     {
         /// <summary>

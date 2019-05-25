@@ -1,12 +1,17 @@
+// <copyright file="RecordTests.cs" company="Glen Nicol">
+// Copyright (c) Glen Nicol. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+
 using NUnit.Framework;
 using RecordShims;
 using System;
 
-namespace Tests
+namespace RecordShims.Tests
 {
+    [TestFixture]
     public class RecordTests
     {
-
         [Test]
         public void With_copies_and_mutates()
         {
