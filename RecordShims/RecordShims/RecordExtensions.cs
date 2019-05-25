@@ -23,21 +23,64 @@ namespace RecordShims
         /// <param name="record">The original record that is copied.</param>
         /// <param name="changeSetBuilder">The builder function used to configure the properties that will be mutated.</param>
         /// <returns>A new instance of the <typeparamref name="TRecord"/> type.</returns>
-        public static TRecord With<TRecord>(this IRecord<TRecord> record, Action<PropertyChangeSet<TRecord>> changeSetBuilder)
+        public static TRecord With<TRecord>(this IRecord<TRecord> record, Action<IPropertyChangeSet<TRecord>> changeSetBuilder)
         {
-            var copy = record.ShallowCopy();
-            var changeSet = new PropertyChangeSet<TRecord>();
+            var changeSet = record.StartChangeSet();
             changeSetBuilder(changeSet);
 
-            foreach(var mutator in changeSet.Mutators)
+            return changeSet.ToNewRecord(record);
+        }
+
+        /// <summary>
+        /// Create a new empty change set for a <typeparamref name="TRecord"/> record.
+        /// </summary>
+        /// <typeparam name="TRecord">The record type.</typeparam>
+        /// <param name="record"></param>
+        /// <returns>A new change set object.</returns>
+        public static IPropertyChangeSet<TRecord> StartChangeSet<TRecord>(this IRecord<TRecord> record)
+        {
+            return new PropertyChangeSet<TRecord>();
+        }
+
+        /// <summary>
+        /// Copies <paramref name="record"/> and applies the changes in <paramref name="changeSet"/>. If there are no changes then <paramref name="record"/> is returned.
+        /// </summary>
+        /// <typeparam name="TRecord">The record type.</typeparam>
+        /// <param name="changeSet"></param>
+        /// <param name="record"></param>
+        /// <returns>A copy of <paramref name="record"/> with changes or <paramref name="record"/> if there are no changes to apply.</returns>
+        public static TRecord ToNewRecord<TRecord>(this IPropertyChangeSet<TRecord> changeSet, IRecord<TRecord> record)
+        {
+            // potentially unsafe cast?
+            var original = (TRecord)record;
+            if(changeSet.Mutators.Count > 0)
             {
-                // potentially unsafe cast?
-                mutator.ApplyMutation((TRecord)record, copy);
+                var copy = record.ShallowCopy();
+                foreach(var mutator in changeSet.Mutators)
+                {
+                    mutator.ApplyMutation(original, copy);
+                }
+
+                record.ThrowIfConstraintsAreViolated(copy);
+
+                return copy;
             }
+            else
+            {
+                return original;
+            }
+        }
 
-            record.ThrowIfConstraintsAreViolated(copy);
-
-            return copy;
+        /// <summary>
+        /// If there are changes in <paramref name="changeset"/> a copy is made and the changeset is applied to the copy.
+        /// </summary>
+        /// <typeparam name="TRecord">The record type.</typeparam>
+        /// <param name="record"></param>
+        /// <param name="changeset"></param>
+        /// <returns>A copy of <paramref name="record"/> with changes or <paramref name="record"/> if there are no changes to apply.</returns>
+        public static TRecord CopyAndApply<TRecord>(this IRecord<TRecord> record, IPropertyChangeSet<TRecord> changeset)
+        {
+            return changeset.ToNewRecord(record);
         }
     }
 }

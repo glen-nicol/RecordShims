@@ -13,14 +13,14 @@ namespace RecordShims
     /// A set of mutations that can be applied to a record.
     /// </summary>
     /// <typeparam name="TRecord">The type of the record.</typeparam>
-    public class PropertyChangeSet<TRecord>
+    public class PropertyChangeSet<TRecord> : ISubsequentPropertyChangeSetApi<TRecord>
     {
         private readonly Dictionary<string, PropertyMutator<TRecord>> _mutationSet = new Dictionary<string, PropertyMutator<TRecord>>();
 
         /// <summary>
         /// Gets The mutations that will be applied to a record.
         /// </summary>
-        public IEnumerable<PropertyMutator<TRecord>> Mutators => _mutationSet.Values;
+        public IReadOnlyCollection<PropertyMutator<TRecord>> Mutators => _mutationSet.Values;
 
         /// <summary>
         /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and specified <paramref name="newValue"/>.
@@ -28,8 +28,8 @@ namespace RecordShims
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
         /// <param name="newValue"></param>
-        /// <returns>A new API to enable a more fluent API. If this is called from a <see cref="SubsequentPropertyChangeSetApi{TRecord}"/> then the same wrapper is returned.</returns>
-        public SubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, TVal newValue)
+        /// <returns>A new API to enable a more fluent API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, TVal newValue)
         {
             var propertyInfo = PropertyMutator<TRecord>.GetPropertyFromExpression(propertyAccessor);
             var mutator = PropertyMutator<TRecord>.FromAssignment(propertyInfo, newValue);
@@ -42,8 +42,8 @@ namespace RecordShims
         /// <typeparam name="TVal">The property type.</typeparam>
         /// <param name="propertyAccessor"></param>
         /// <param name="mutatorFunc"></param>
-        /// <returns>A new API to enable a more fluent API. If this is called from a <see cref="SubsequentPropertyChangeSetApi{TRecord}"/> then the same wrapper is returned.</returns>
-        public SubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, Func<TRecord, TVal> mutatorFunc)
+        /// <returns>A new API to enable a more fluent API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> Mutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, Func<TRecord, TVal> mutatorFunc)
         {
             var propertyInfo = PropertyMutator<TRecord>.GetPropertyFromExpression(propertyAccessor);
             var mutator = PropertyMutator<TRecord>.FromTransform(propertyInfo, r => mutatorFunc(r));
@@ -54,18 +54,45 @@ namespace RecordShims
         /// Adds a mutator to the change set.
         /// </summary>
         /// <param name="mutator"></param>
-        /// <returns>A new API to enable a more fluent API. If this is called from a <see cref="SubsequentPropertyChangeSetApi{TRecord}"/> then the same wrapper is returned.</returns>
-        public SubsequentPropertyChangeSetApi<TRecord> Mutate(PropertyMutator<TRecord> mutator)
+        /// <returns>A new API to enable a more fluent API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> Mutate(PropertyMutator<TRecord> mutator)
         {
             _mutationSet[mutator.PropertyName] = mutator;
-            if(this is SubsequentPropertyChangeSetApi<TRecord>)
-            {
-                return this as SubsequentPropertyChangeSetApi<TRecord>;
-            }
-            else
-            {
-                return new SubsequentPropertyChangeSetApi<TRecord>(this);
-            }
+            return this;
+        }
+
+        /// <summary>
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, TVal)"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyAccessor"></param>
+        /// <param name="newValue"></param>
+        /// <returns>this API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, TVal newValue)
+        {
+            return Mutate(propertyAccessor, newValue);
+        }
+
+        /// <summary>
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate{TVal}(Expression{Func{TRecord, TVal}}, Func{TRecord, TVal})"/>.
+        /// </summary>
+        /// <typeparam name="TVal">The property type.</typeparam>
+        /// <param name="propertyAccessor"></param>
+        /// <param name="mutatorFunc"></param>
+        /// <returns>this API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> AndMutate<TVal>(Expression<Func<TRecord, TVal>> propertyAccessor, Func<TRecord, TVal> mutatorFunc)
+        {
+            return Mutate(propertyAccessor, mutatorFunc);
+        }
+
+        /// <summary>
+        /// The same as <see cref="PropertyChangeSet{TRecord}.Mutate(PropertyMutator{TRecord})"/>.
+        /// </summary>
+        /// <param name="mutator"></param>
+        /// <returns>this API.</returns>
+        public ISubsequentPropertyChangeSetApi<TRecord> AndMutate(PropertyMutator<TRecord> mutator)
+        {
+            return Mutate(mutator);
         }
     }
 }
