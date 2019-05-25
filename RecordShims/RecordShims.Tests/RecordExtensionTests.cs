@@ -14,20 +14,20 @@ namespace RecordShims.Tests
         [Test]
         public void With_copies_and_mutates()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
             Assert.AreEqual(0, original.AnInteger);
 
             var newRecord = original.With(copy => copy.Mutate(t => t.AnInteger, 1).AndMutate(t => t.ADouble, 1.0));
 
             Assert.AreEqual(1, newRecord.AnInteger);
             Assert.AreEqual(1.0, newRecord.ADouble);
-            Assert.AreEqual(new TestingClass(), original, "The original was changed.");
+            Assert.AreEqual(new TestingRecord(), original, "The original was changed.");
         }
 
         [Test]
         public void Records_can_start_a_new_changeset_and_apply_them()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             var newRecord = original.StartChangeSet()
                 .Mutate(t => t.AnInteger, 2)
@@ -36,13 +36,13 @@ namespace RecordShims.Tests
 
             Assert.AreEqual(2, newRecord.AnInteger);
             Assert.AreEqual(1.0, newRecord.ADouble);
-            Assert.AreEqual(new TestingClass(), original, "The original was changed.");
+            Assert.AreEqual(new TestingRecord(), original, "The original was changed.");
         }
 
         [Test]
         public void Changesets_can_specify_transforms()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             var changeSet = original.StartChangeSet()
                 .Mutate(t => t.AnInteger, t => t.AnInteger + 1)
@@ -62,7 +62,7 @@ namespace RecordShims.Tests
         [Test]
         public void Changesets_can_be_applied_multiple_times()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             // can store a changeset
             var changeSet = original.StartChangeSet()
@@ -72,7 +72,7 @@ namespace RecordShims.Tests
             var record2 = changeSet.ToNewRecord(original);
 
             Assert.AreEqual(1, record2.AnInteger);
-            Assert.AreEqual(new TestingClass(), original, "The original was changed.");
+            Assert.AreEqual(new TestingRecord(), original, "The original was changed.");
 
             var record3 = original.With(copy => copy.Mutate(t => t.AnInteger, 5).AndMutate(t => t.ADouble, 1.0));
 
@@ -88,7 +88,7 @@ namespace RecordShims.Tests
         [Test]
         public void Duplicate_property_mutations_replace_earlier_ones()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             var record2 = original.StartChangeSet()
                 .Mutate(t => t.AnInteger, 1)
@@ -101,7 +101,7 @@ namespace RecordShims.Tests
         [Test]
         public void Constraints_are_validated_on_apply()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             var changeset = original.StartChangeSet()
                 .Mutate(t => t.RecordedAt, DateTimeOffset.Now);
@@ -113,7 +113,7 @@ namespace RecordShims.Tests
         [Test]
         public void Can_use_string_but_type_safety_is_not_static()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             // This method should be a bit more performant becasue it avoids expression walking, but
             // it sacrifices type safety.
@@ -135,7 +135,7 @@ namespace RecordShims.Tests
         [Test]
         public void Can_mutate_readonly_auto_properties()
         {
-            var original = new TestingClass();
+            var original = new TestingRecord();
 
             var record2 = original.StartChangeSet()
                 .Mutate(t => t.ReadonlyAutoBool, true)
@@ -145,7 +145,7 @@ namespace RecordShims.Tests
             Assert.IsFalse(original.ReadonlyAutoBool);
         }
 
-        private class TestingClass : RecordBase<TestingClass>, IEquatable<TestingClass>
+        private class TestingRecord : RecordBase<TestingRecord>, IEquatable<TestingRecord>
         {
             public int AnInteger { get; private set; }
 
@@ -155,7 +155,7 @@ namespace RecordShims.Tests
 
             public bool ReadonlyAutoBool { get; }
 
-            public bool Equals(TestingClass other)
+            public bool Equals(TestingRecord other)
             {
                 return ReferenceEquals(this, other)
                     || (other != null
@@ -164,7 +164,7 @@ namespace RecordShims.Tests
                     && RecordedAt == other.RecordedAt);
             }
 
-            public override void ThrowIfConstraintsAreViolated(TestingClass record)
+            public override void ThrowIfConstraintsAreViolated(TestingRecord record)
             {
                 // if changed at all
                 if(record.RecordedAt > DateTimeOffset.MinValue)
