@@ -145,6 +145,17 @@ namespace RecordShims.Tests
             Assert.IsFalse(original.ReadonlyAutoBool);
         }
 
+        [Test]
+        public void A_changeset_with_no_mutators_returns_original_record()
+        {
+            var original = new TestingRecord();
+
+            var record2 = original.StartChangeSet()
+                .ToNewRecord(original);
+
+            Assert.AreSame(original, record2);
+        }
+
         private class TestingRecord : RecordBase<TestingRecord>, IEquatable<TestingRecord>
         {
             public int AnInteger { get; private set; }
