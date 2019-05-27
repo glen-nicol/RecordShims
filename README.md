@@ -100,4 +100,39 @@ Private setters and readonly fields are modifiable. Normally, this would be a hu
 alarm in a code base. The API of this library is meant to limit the scope of this
 violation so that it is useful but not dangerous.
 
+## Building and Testing
+
+The solution should be buildable in VS 2017 and 2019 Community. They're .Net core projects. Visual studio code can even build and test them.
+
+To get coverage I ran the following command:
+
+```
+dotnet test /p:CollectCoverage=true /p:Exclude=[NUnit3.TestAdapter]\* /p:CoverletOutputFormat=\"json,opencover,lcov\" /p:CoverletOutput='./.coverage/'
+```
+
+This should generate a json, lcov, and opencover file for various coverage displays. I prefer Axocover but it does not support .Net Core yet.
+I ended up using the following VS code extensions.
+
+* [Coverage Gutters](https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters)
+* [.Net Core Test Explorer](https://marketplace.visualstudio.com/items?itemName=formulahendry.dotnet-test-explorer)
+
+To display code with Coverage gutters I had to chagne a setting to look for coverage.info as well as the default lcov.info.
+
+```
+    "coverage-gutters.coverageFileNames": [
+        "lcov.info",
+        "coverage.info",
+        "cov.xml",
+        "jacoco.xml"
+      ]
+```
+
+The test explorer settings have test arugment setting that can be set. I wish it was per repo.
+
+```
+"dotnet-test-explorer.testArguments": "/p:CollectCoverage=true /p:Exclude=[NUnit3.TestAdapter]\\* /p:CoverletOutputFormat=\\\"json,opencover,lcov\\\" /p:CoverletOutput=\\\"./.coverage/\\\""
+```
+
+
+
 
