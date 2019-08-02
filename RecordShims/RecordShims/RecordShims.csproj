@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Glen Nicol</Authors>
+    <Description>This library aims to reduce the boilerplate to create records for older projects that cannot upgrade to C# 8.0 when it is released and for any current projects that don't want to wait for C# 8.0 to be released with record support.</Description>
+    <Copyright>Copyright (c) 2019 Glen Nicol</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/glen-nicol/RecordShims</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>csharp; records</PackageTags>
+    <PackageReleaseNotes>Initial release. Expect some bugs and breaking changes to come.</PackageReleaseNotes>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -25,5 +37,12 @@
     <AdditionalFiles Include="..\stylecop.json">
       <Link>stylecop.json</Link>
     </AdditionalFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>
