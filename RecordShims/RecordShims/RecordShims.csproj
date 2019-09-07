@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net46;net45;</TargetFrameworks>
     <Authors>Glen Nicol</Authors>
     <Description>This library aims to reduce the boilerplate to create records for older projects that cannot upgrade to C# 8.0 when it is released and for any current projects that don't want to wait for C# 8.0 to be released with record support.</Description>
     <Copyright>Copyright (c) 2019 Glen Nicol</Copyright>
@@ -14,6 +14,16 @@
     <FileVersion>0.1.0.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <!--Shameless ripped from Rick Stahl's wonderful blog post https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20-->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <!--Shameless ripped from Rick Stahl's wonderful blog post https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20-->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
+    <DefineConstants>NET45;NETFULL</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

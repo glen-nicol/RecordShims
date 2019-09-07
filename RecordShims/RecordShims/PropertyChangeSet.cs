@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace RecordShims
@@ -20,7 +21,11 @@ namespace RecordShims
         /// <summary>
         /// Gets The mutations that will be applied to a record.
         /// </summary>
+#if NET45
+        public IReadOnlyCollection<PropertyMutator<TRecord>> Mutators => _mutationSet.Values.ToList();
+#else
         public IReadOnlyCollection<PropertyMutator<TRecord>> Mutators => _mutationSet.Values;
+#endif
 
         /// <summary>
         /// Adds a mutator for the property pointed to by <paramref name="propertyAccessor"/> and
