@@ -10,10 +10,10 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>csharp; records</PackageTags>
     <PackageReleaseNotes>Initial release. Expect some bugs and breaking changes to come.</PackageReleaseNotes>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <FileVersion>0.1.1.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
   </PropertyGroup>
 
   <!--Shameless ripped from Rick Stahl's wonderful blog post https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20-->
