@@ -82,6 +82,29 @@ class RecordExample : RecordBase<RecordExample> // Recordbase<T> implements IRec
 }
 ```
 
+Alternatively if you already have a base type or just hate inheritance in C#.
+You can implement the IRecord<T> interface and use RecordUtil.MemberwiseClone to 
+easily copy objects like so...
+
+```csharp
+class AlreadyHasABase : CommonBase, IRecord<AlreadyHasABase>
+{
+    AlreadyHasABase IRecord<AlreadyHasABase>.ShallowCopy()
+    {
+        // RecordUtil exposes MemberwiseClone for easy shallow copies.
+        // Note: It is yet another performance drag so it is a good candidate
+        // for an optimization of each class to implement a constructor that
+        // copies each field.
+        return RecordUtil.MemberwiseClone(this);
+    }
+
+    void ThrowIfConstraintsAreViolated(AlreadyHasABase record)
+    {
+        // constraints
+    }
+}
+```
+
 ## How it Works
 
 Please refer to the IRecord<TRecord> interface. Types that implement that interface
